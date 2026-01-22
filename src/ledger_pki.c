@@ -36,7 +36,13 @@ int check_signature_with_pubkey(const char *tag,
 
     PRINTF("[%s] ==================================================================\n", tag);
     error = os_pki_get_info(&key_usage, trusted_name, &trusted_name_len, &public_key);
-    if ((error == 0) && (key_usage == keyUsageExp)) {
+
+    // very hacky: in the context of LES_MULTISIG we want to force to use the hardcoded key
+    // LES_MULTISIG_STG_KEY without having to change keyUsage in the response from backend
+    // because we want to test things stg
+    int force_fallback = strcmp(tag, "Trusted Name") == 0;
+
+    if ((error == 0) && (key_usage == keyUsageExp) && !force_fallback) {
         PRINTF("[%s] Certificate '%s' loaded for usage 0x%x (%s)\n",
                tag,
                trusted_name,

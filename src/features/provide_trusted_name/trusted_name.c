@@ -566,6 +566,9 @@ bool handle_trusted_name_struct(const s_tlv_data *data, s_trusted_name_ctx *cont
 static bool verify_trusted_name_signature(const s_trusted_name_ctx *context) {
     uint8_t hash[INT256_LENGTH];
 
+    const uint8_t *pk = LES_MULTISIG_STG_KEY;
+    size_t pk_size = sizeof(LES_MULTISIG_STG_KEY);
+
     if (cx_hash_no_throw((cx_hash_t *) &context->hash_ctx, CX_LAST, NULL, 0, hash, INT256_LENGTH) !=
         CX_OK) {
         return false;
@@ -574,8 +577,8 @@ static bool verify_trusted_name_signature(const s_trusted_name_ctx *context) {
     if (check_signature_with_pubkey("Trusted Name",
                                     hash,
                                     sizeof(hash),
-                                    NULL,
-                                    0,
+                                    pk,
+                                    pk_size,
                                     CERTIFICATE_PUBLIC_KEY_USAGE_TRUSTED_NAME,
                                     (uint8_t *) (context->input_sig),
                                     context->input_sig_size) != CX_OK) {
